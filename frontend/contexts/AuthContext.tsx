@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { jwtDecode } from 'jwt-decode';
+import axios, { AxiosError } from 'axios'; // <-- AÑADIDO
 
 export interface User {
   id: string;
@@ -11,10 +12,16 @@ export interface User {
   assignedPsychologist?: string;
 }
 
+// Objeto de retorno para las funciones de autenticación
+interface AuthResponse {
+  success: boolean;
+  message?: string;
+}
+
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (userData: RegisterData) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<AuthResponse>;
+  register: (userData: RegisterData) => Promise<AuthResponse>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -49,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     validateToken();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<AuthResponse> => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
@@ -60,8 +67,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       });
 
-      console.log('LOGIN RESPONSE:', response.data); // Debug line
-
       const { access_token, user } = response.data;
 
       if (access_token && user) {
@@ -69,29 +74,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
         setUser(user);
         setIsLoading(false);
-        return true;
+        return { success: true };
       }
-
       setIsLoading(false);
-      return false;
+      return { success: false, message: "Invalid response from server" };
 
     } catch (error) {
       console.error('Error de login:', error);
       setIsLoading(false);
-      return false;
+      const err = error as AxiosError<{ detail: string }>;
+      return { success: false, message: err.response?.data?.detail || "An unknown login error occurred" };
     }
   };
 
-  const register = async (userData: RegisterData): Promise<boolean> => {
+  const register = async (userData: RegisterData): Promise<AuthResponse> => {
     setIsLoading(true);
     try {
       await api.post('/auth/register', userData);
+      // Si el registro es exitoso, intenta hacer login
+      const loginResult = await login(userData.email, userData.password);
       setIsLoading(false);
-      return await login(userData.email, userData.password);
+      return loginResult;
     } catch (error) {
       console.error('Error de registro:', error);
       setIsLoading(false);
-      return false;
+      // Extrae el mensaje de error específico del backend
+      const err = error as AxiosError<{ detail: string }>;
+      return { success: false, message: err.response?.data?.detail || "An unknown registration error occurred" };
     }
   };
 

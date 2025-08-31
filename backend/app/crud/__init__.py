@@ -1,2 +1,5 @@
-from .crud_user import get_user_by_email, create_user
-
+from .crud_user import get_user_by_email, create_user, assign_patient_to_therapist, remove_patient_from_therapist, search_users_by_name, update_patient_profile
+from .crud_drawings import create_patient_drawing, get_drawings_by_patient, get_patient_drawings_for_therapist
+from .crud_avatars import create_patient_avatar, get_avatars_by_patient
+from .crud_tca_phrases import get_random_phrase_by_type
+from .crud_conversation_logs import create_conversation_log

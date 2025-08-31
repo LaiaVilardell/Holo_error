@@ -1,91 +1,50 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { Toaster } from '@/components/ui/toaster';
+import Index from './pages/Index';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import PatientDashboard from './pages/PatientDashboard';
+import TherapistDashboard from './pages/TherapistDashboard';
+import Drawing from './pages/Drawing';
+import Avatar from './pages/Avatar';
+import NotFound from './pages/NotFound';
+import DashboardRedirect from './pages/DashboardRedirect';
+import ConversationSetup from './pages/ConversationSetup';
+import Conversation from './pages/Conversation'; // <-- AÑADIDO
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import Index from "./pages/Index";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import PatientDashboard from "./pages/PatientDashboard";
-import TherapistDashboard from "./pages/TherapistDashboard";
-import Drawing from "./pages/Drawing";
-import Avatar from "./pages/Avatar";
-import NotFound from "./pages/NotFound";
-
-const queryClient = new QueryClient();
-
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, isLoading } = useAuth();
-  
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-  
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  return <>{children}</>;
-};
-
-const DashboardRoute = () => {
-  const { user } = useAuth();
-  
-  if (user?.role === 'patient') {
-    return <PatientDashboard />;
-  } else if (user?.role === 'psychologist') {
-    return <TherapistDashboard />;
-  }
-  
-  return <Navigate to="/login" replace />;
-};
-
-const AppRoutes = () => {
-  const { user } = useAuth();
-
+function App() {
   return (
-    <Routes>
-      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Index />} />
-      <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
-      <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <Register />} />
-      <Route path="/dashboard" element={
-        <ProtectedRoute>
-          <DashboardRoute />
-        </ProtectedRoute>
-      } />
-      <Route path="/drawing" element={
-        <ProtectedRoute>
-          <Drawing />
-        </ProtectedRoute>
-      } />
-      <Route path="/avatar" element={
-        <ProtectedRoute>
-          <Avatar />
-        </ProtectedRoute>
-      } />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  );
-};
+    <AuthProvider>
+      <Router>
+        <Routes>
+          {/* Ruta Principal */}
+          <Route path="/" element={<Index />} />
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+          {/* Ruta de redirección post-login/registro */}
+          <Route path="/dashboard" element={<DashboardRedirect />} />
+
+          {/* Rutas públicas */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          {/* Rutas de Pacientes */}
+          <Route path="/patient/dashboard" element={<PatientDashboard />} />
+          <Route path="/patient/drawing" element={<Drawing />} />
+          <Route path="/patient/avatar" element={<Avatar />} />
+          <Route path="/conversation-setup" element={<ConversationSetup />} />
+          <Route path="/conversation" element={<Conversation />} /> {/* <-- AÑADIDO */}
+
+          {/* Rutas de Terapeutas */}
+          <Route path="/therapist/dashboard" element={<TherapistDashboard />} />
+
+          {/* Ruta para página no encontrada */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
       <Toaster />
-      <Sonner />
-      <AuthProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+    </AuthProvider>
+  );
+}
 
 export default App;

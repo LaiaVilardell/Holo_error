@@ -7,7 +7,7 @@ from ... import schemas, crud
 from ...database import get_db
 from ...core.security import verify_password, create_access_token
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(tags=["auth"])
 
 @router.post("/login", response_model=schemas.Token) # genera un JWT con {"sub": user.email, "role": user.role} y devuelve además el UserRead completo para tu frontend
 def login(
