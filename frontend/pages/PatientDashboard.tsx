@@ -44,7 +44,7 @@ const PatientDashboard = () => {
       <header className="bg-[#20232a] border-b border-[#282c34] px-6 py-4">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center space-x-4">
-            <img src="/logo_2.png" alt="Holo Logo" className="w-12 h-12" />
+            <img src="/HOLO.png" alt="Holo Logo" className="w-12 h-12" />
             <div>
               <h1 className="text-xl font-bold text-white">Holo</h1>
               <p className="text-sm text-gray-400">Your safe space</p>
@@ -53,7 +53,6 @@ const PatientDashboard = () => {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
               <Avatar>
-                <AvatarImage src={user?.avatar} />
                 <AvatarFallback className="bg-[#8ecae6] text-[#282c34]">{user?.name?.split(' ').map(n => n[0]).join('')}</AvatarFallback>
               </Avatar>
               <div className="hidden sm:block">
@@ -61,7 +60,7 @@ const PatientDashboard = () => {
                 <p className="text-xs text-gray-400">Patient (ID: {user?.id})</p>
               </div>
             </div>
-            <Button variant="outline" onClick={handleLogout} className="text-[#f9a8d4] border-[#f9a8d4] hover:text-white hover:bg-[#f9a8d4]/20">
+            <Button variant="outline" onClick={handleLogout} className="bg-[#5390d9] text-white hover:bg-[#8ecae6]">
               <LogOut className="w-4 h-4" />
             </Button>
           </div>
@@ -101,7 +100,7 @@ const PatientDashboard = () => {
               <CardDescription className="text-gray-300">Express your emotions through drawing from scratch.</CardDescription>
             </CardHeader>
             <CardContent className="text-center">
-              <Button onClick={() => navigate('/patient/drawing')} className="w-full bg-[#8ecae6] text-[#282c34] font-medium py-3 hover:bg-[#5390d9] hover:text-white">
+              <Button onClick={() => navigate('/patient/drawing')} className="w-full bg-[#c084fc] text-white font-medium py-3 hover:bg-[#a064d9]">
                 <Pencil className="w-5 h-5 mr-2" />
                 Start Drawing
               </Button>
@@ -115,7 +114,7 @@ const PatientDashboard = () => {
               <CardDescription className="text-gray-300">Personalize a pre-made avatar to represent your feelings.</CardDescription>
             </CardHeader>
             <CardContent className="text-center">
-              <Button onClick={() => handleActivitySelection('avatar')} className="w-full bg-[#f9a8d4] text-[#282c34] font-medium py-3 hover:bg-[#c084fc] hover:text-white">
+              <Button onClick={() => navigate('/avatar-creator')} className="w-full bg-[#c084fc] text-white font-medium py-3 hover:bg-[#a064d9]">
                 <User className="w-5 h-5 mr-2" />
                 Customize Avatar
               </Button>

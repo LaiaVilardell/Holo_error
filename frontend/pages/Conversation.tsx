@@ -3,38 +3,35 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import api from '@/lib/api';
 
-// UI Components
+// Componentes de UI
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Volume2, RefreshCw, Mic, MicOff, Save } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Mic, MicOff, Save } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
-// Avatar Components
-import Face from '@/components/avatar_parts/Face';
-import Eyes from '@/components/avatar_parts/Eyes';
-import Mouth from '@/components/avatar_parts/Mouth';
-import HairShort from '@/components/avatar_parts/HairShort';
-import HairLong from '@/components/avatar_parts/HairLong';
-
 // --- Sub-componente para el Canvas de Dibujo ---
-const DrawingCanvas = ({ getCanvasData }: { getCanvasData: (data: string) => void }) => {
+const DrawingCanvas = ({ initialImageData, getCanvasData }: { initialImageData?: string, getCanvasData: (data: string) => void }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [currentColor, setCurrentColor] = useState('#000000');
-  const [brushSize, setBrushSize] = useState(5);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     if (canvas && ctx) {
-      canvas.width = canvas.parentElement?.clientWidth || 500;
-      canvas.height = canvas.parentElement?.clientHeight || 500;
+      canvas.width = 500;
+      canvas.height = 500;
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (initialImageData) {
+        const img = new Image();
+        img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        img.src = initialImageData;
+      }
     }
-  }, []);
+  }, [initialImageData]);
 
   const startDrawing = ({ nativeEvent }: React.MouseEvent) => {
     const { offsetX, offsetY } = nativeEvent;
@@ -57,8 +54,8 @@ const DrawingCanvas = ({ getCanvasData }: { getCanvasData: (data: string) => voi
     const { offsetX, offsetY } = nativeEvent;
     const ctx = canvasRef.current?.getContext('2d');
     if (ctx) {
-      ctx.strokeStyle = currentColor;
-      ctx.lineWidth = brushSize;
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 5;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       ctx.lineTo(offsetX, offsetY);
@@ -66,22 +63,15 @@ const DrawingCanvas = ({ getCanvasData }: { getCanvasData: (data: string) => voi
     }
   };
 
-  return <canvas ref={canvasRef} onMouseDown={startDrawing} onMouseUp={stopDrawing} onMouseLeave={stopDrawing} onMouseMove={draw} className="bg-white rounded-lg w-full h-full cursor-crosshair" />;
-};
-
-// --- Sub-componente para el Avatar ---
-const AvatarDisplay = () => {
-  const features = { hairStyle: 'short', hairColor: '#8B4513', eyeColor: '#4A5568', skinTone: '#F7E6D3' };
   return (
-    <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-lg">
-      <svg viewBox="0 0 200 200" className="w-4/5 h-4/5">
-        {features.hairStyle === 'short' && <HairShort hairColor={features.hairColor} />}
-        {features.hairStyle === 'long' && <HairLong hairColor={features.hairColor} />}
-        <Face skinTone={features.skinTone} />
-        <Eyes eyeColor={features.eyeColor} />
-        <Mouth />
-      </svg>
-    </div>
+    <canvas 
+      ref={canvasRef} 
+      onMouseDown={startDrawing}
+      onMouseUp={stopDrawing}
+      onMouseLeave={stopDrawing}
+      onMouseMove={draw}
+      className="bg-white rounded-lg cursor-crosshair"
+    />
   );
 };
 
@@ -94,12 +84,13 @@ const Conversation = () => {
   const activity = searchParams.get('activity');
   const tcaType = searchParams.get('tca') || 'general';
   const selectedVoiceUri = decodeURIComponent(searchParams.get('voice') || '');
+  const avatarUrl = decodeURIComponent(searchParams.get('avatar') || '');
 
   const [textToSpeak, setTextToSpeak] = useState('Loading thought...');
   const [patientResponse, setPatientResponse] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [activityData, setActivityData] = useState<string>('');
+  const [loadedDrawingData, setLoadedDrawingData] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
 
   const speak = (text: string) => {
@@ -155,35 +146,49 @@ const Conversation = () => {
     }
   }, [voices]);
 
+  useEffect(() => {
+    const fetchDrawing = async () => {
+      if (activity === 'drawing' && user) {
+        try {
+          const response = await api.get(`/drawings/users/${user.id}/drawings/`);
+          if (response.data && response.data.length > 0) {
+            setLoadedDrawingData(response.data[0].image_data);
+          }
+        } catch (error) { console.error("Error fetching drawing:", error); }
+      }
+    };
+    fetchDrawing();
+  }, [activity, user]);
+
   const handleEndSession = async () => {
     if (!user) return;
-    // Construir el historial de la conversación
     const transcript = `AI: ${textToSpeak}\nPatient: ${patientResponse}`;
     try {
       await api.post(`/users/${user.id}/conversations/`, { transcript });
       toast({ title: "Session Saved", description: "Your conversation has been saved." });
       navigate('/patient/dashboard');
-    } catch (error) {
-      console.error("Failed to save session:", error);
-      toast({ title: "Error", description: "Could not save your session.", variant: "destructive" });
-    }
+    } catch (error) { console.error("Failed to save session:", error); toast({ title: "Error", description: "Could not save your session.", variant: "destructive" }); }
   };
 
   return (
     <div className="min-h-screen bg-[#282c34]">
       <header className="bg-[#20232a] border-b border-[#282c34] px-6 py-4">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <Button variant="outline" onClick={() => navigate('/patient/dashboard')} className="text-white">Back to Dashboard</Button>
+          <Button variant="outline" onClick={() => navigate('/patient/dashboard')} className="bg-[#5390d9] text-white hover:bg-[#8ecae6]">Back to Dashboard</Button>
           <h1 className="text-xl font-bold text-white">Step 3: Conversation</h1>
-          <Button onClick={handleEndSession} className="bg-green-600 hover:bg-green-700"><Save className="w-4 h-4 mr-2"/>End & Save Session</Button>
+          <Button onClick={handleEndSession} className="bg-[#f9a8d4] text-[#282c34] hover:bg-[#c084fc] hover:text-white"><Save className="w-4 h-4 mr-2"/>End & Save Session</Button>
         </div>
       </header>
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid md:grid-cols-2 gap-8 items-start">
           <Card className="gentle-shadow border-0 bg-[#20232a]">
             <CardHeader><CardTitle className="text-white">Your Creation</CardTitle></CardHeader>
-            <CardContent className="h-[550px]">
-              {activity === 'drawing' ? <DrawingCanvas getCanvasData={setActivityData} /> : <AvatarDisplay />}
+            <CardContent className="h-[550px] flex items-center justify-center bg-gray-800 rounded-lg">
+              {activity === 'drawing' ? (
+                <DrawingCanvas getCanvasData={(data) => console.log(data)} initialImageData={loadedDrawingData || undefined} />
+              ) : (
+                <img src={avatarUrl} alt="Avatar" className="w-96 h-96" />
+              )}
             </CardContent>
           </Card>
           <Card className="gentle-shadow border-0 bg-[#20232a]">
@@ -199,9 +204,8 @@ const Conversation = () => {
               </div>
               <div className="flex flex-col gap-2 pt-4">
                 <Button onClick={handleListen} disabled={isListening} className={`w-full transition-colors ${isListening ? 'bg-red-600' : 'bg-green-700'}`}>
-                  {isListening ? <><MicOff className="w-4 h-4 mr-2"/><span>Listening...</span></> : <><Mic className="w-4 h-4 mr-2"/><span>Respond by Speaking</span></>}
-                </Button>
-                <Button onClick={getNewPhrase} variant="secondary" className="w-full"><RefreshCw className="w-4 h-4 mr-2"/>Generate New Thought</Button>
+                  {isListening ? <><MicOff className="w-4 h-4 mr-2"/><span>Listening...</span></> : <><Mic className="w-4 h-4 mr-2"/><span>Respond by Speaking</span></>}</Button>
+                <Button onClick={getNewPhrase} variant="secondary" className="w-full bg-[#c084fc] text-white font-medium py-3 hover:bg-[#a064d9]"><RefreshCw className="w-4 h-4 mr-2"/>Generate New Thought</Button>
               </div>
             </CardContent>
           </Card>

@@ -32,6 +32,17 @@ interface Drawing {
   created_at: string;
 }
 
+interface EditingProfile {
+  name?: string;
+  surname?: string;
+  phone?: string;
+  center?: string;
+  birthdate?: string;
+  gender?: string;
+  treatment?: string;
+  notes?: string;
+}
+
 const TherapistDashboard = () => {
 	const { user, logout } = useAuth();
 	const navigate = useNavigate();
@@ -43,12 +54,12 @@ const TherapistDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Patient[]>([]);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [editingProfile, setEditingProfile] = useState<any>({});
+  const [editingProfile, setEditingProfile] = useState<EditingProfile>({});
 
   const fetchPatients = async () => {
     if (user && user.role === 'psychologist') {
       try {
-        const response = await api.get(`/users/therapists/${user.id}/patients`);
+        const response = await api.get<{ patients: PatientData[] }>(`/users/therapists/${user.id}/patients`);
         if (response.data && response.data.patients) {
           setPatients(response.data.patients);
           if (response.data.patients.length > 0 && !selectedPatient) {
@@ -65,7 +76,7 @@ const TherapistDashboard = () => {
     const fetchDrawings = async () => {
       if (selectedPatient && user) {
         try {
-          const response = await api.get(`/drawings/therapists/${user.id}/patients/${selectedPatient.id}/drawings`);
+          const response = await api.get<Drawing[]>(`/drawings/therapists/${user.id}/patients/${selectedPatient.id}/drawings`);
           setPatientDrawings(response.data);
         } catch (error) { setPatientDrawings([]); }
       } else { setPatientDrawings([]); }
@@ -80,7 +91,7 @@ const TherapistDashboard = () => {
     if (query.length > 1) {
       const timeout = setTimeout(async () => {
         try {
-          const response = await api.get(`/users/search/`, { params: { name: query } });
+          const response = await api.get<Patient[]>(`/users/search/`, { params: { name: query } });
           setSearchResults(response.data);
         } catch (error) { console.error("Failed to search patients", error); }
       }, 500);
@@ -118,13 +129,13 @@ const TherapistDashboard = () => {
   };
 
   const handleProfileUpdate = async () => {
-    if (!selectedPatient) return;
+    if (!selectedPatient || !user) return;
     const payload = { ...editingProfile };
     if (payload.birthdate === '') payload.birthdate = null;
     try {
-      const res = await api.put(`/users/patients/${selectedPatient.id}/profile`, payload);
+      await api.put(`/users/patients/${selectedPatient.id}/profile`, payload);
       toast({ title: "Profile Updated", description: "Patient details have been saved." });
-      const updatedPatientResponse = await api.get(`/users/therapists/${user.id}/patients`);
+      const updatedPatientResponse = await api.get<{ patients: PatientData[] }>(`/users/therapists/${user.id}/patients`);
       if (updatedPatientResponse.data && updatedPatientResponse.data.patients) {
         setPatients(updatedPatientResponse.data.patients);
         const newlyUpdatedPatient = updatedPatientResponse.data.patients.find(p => p.id === selectedPatient.id);
@@ -139,7 +150,7 @@ const TherapistDashboard = () => {
 			<header className="bg-[#20232a] border-b border-[#282c34] px-6 py-4">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center space-x-4">
-            <img src="/logo_2.png" alt="Holo Logo" className="w-12 h-12" />
+            <img src="/HOLO.png" alt="Holo Logo" className="w-12 h-12" />
             <div><h1 className="text-xl font-bold text-white">Holo</h1><p className="text-sm text-gray-400">Therapist Panel</p></div>
           </div>
           <div className="flex items-center space-x-4">

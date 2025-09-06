@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
-from app import models, schemas, crud
-from app.database import get_db
-from app.core.security import get_current_user
+from ... import models, schemas, crud
+from ...database import get_db
+from ...core.security import get_current_user
 
 router = APIRouter()
 
@@ -57,3 +57,13 @@ def get_therapists_of_patient(patient_id: int, db: Session = Depends(get_db)):
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
     return [schemas.PatientWithTherapists.model_validate(patient)]
+
+@router.put("/{user_id}/avatar", response_model=schemas.UserRead)
+def update_user_avatar_endpoint(user_id: int, avatar: schemas.UserAvatarUpdate, db: Session = Depends(get_db)):
+    """
+    Update user avatar.
+    """
+    db_user = crud.update_user_avatar(db=db, user_id=user_id, avatar_data=avatar.avatar)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user

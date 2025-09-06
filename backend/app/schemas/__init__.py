@@ -1,4 +1,4 @@
-from .user import UserBase, UserCreate, UserRead, PatientWithProfile, TherapistWithProfile, PatientWithTherapists, UserReadWithProfile
+from .user import UserBase, UserCreate, UserRead, PatientWithProfile, TherapistWithProfile, PatientWithTherapists, UserReadWithProfile, UserAvatarUpdate
 from .token import Token, TokenData
 from .patient_drawing import DrawingBase, DrawingCreate, DrawingRead
 from .patient_avatar import AvatarBase, AvatarCreate, AvatarRead

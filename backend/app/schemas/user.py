@@ -17,8 +17,12 @@ class UserCreate(UserBase):
 
 class UserRead(UserBase):
     id: int
+    avatar: Optional[str] = None
     class Config:
         from_attributes = True
+
+class UserAvatarUpdate(BaseModel):
+    avatar: str
 
 # --- NUEVO ESQUEMA GENÉRICO CON PERFIL ---
 class UserReadWithProfile(UserRead):

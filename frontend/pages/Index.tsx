@@ -12,7 +12,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-6 py-20">
           <div className="text-center space-y-8">
             {/* Logo */}
-            <img src="/logo_2.png" alt="Holo Logo" className="w-40 h-40 mx-auto" />
+            <img src="/HOLO.png" alt="Holo Logo" className="w-40 h-40 mx-auto" />
             
             {/* Title */}
             <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-[#8ecae6] to-[#5390d9] bg-clip-text text-transparent">
@@ -103,7 +103,7 @@ const Index = () => {
       <footer className="bg-[#20232a] border-t border-[#282c34] py-8">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <img src="/logo_2.png" alt="Holo Logo" className="w-8 h-8" />
+            <img src="/HOLO.png" alt="Holo Logo" className="w-8 h-8" />
             <span className="font-bold text-white">Holo</span>
           </div>
           <p className="text-gray-400">© 2025 Holo. Designed with care for mental wellbeing.</p>

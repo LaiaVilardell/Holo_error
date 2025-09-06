@@ -27,7 +27,7 @@ const Drawing = () => {
     canvas.height = canvas.offsetHeight;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = '#F0F0F0';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }, []);
 
@@ -72,7 +72,7 @@ const Drawing = () => {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = '#F0F0F0';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   };
 
@@ -95,15 +95,15 @@ const Drawing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e0f2fe] via-white to-[#f3e8ff]">
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <div className="min-h-screen bg-[#282c34] text-white p-4">
+      <header className="bg-[#20232a] border-b border-[#282c34] px-6 py-4">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center space-x-4">
-            <Button variant="outline" onClick={() => navigate('/patient/dashboard')} className="text-gray-600"><ArrowLeft className="w-4 h-4 mr-2" />Back</Button>
-            <div><h1 className="text-xl font-bold text-gray-900">Step 1: Create Your Art</h1><p className="text-sm text-gray-500">Express your emotions through drawing</p></div>
+            <Button variant="outline" onClick={() => navigate('/patient/dashboard')} className="bg-[#5390d9] text-white hover:bg-[#8ecae6]"><ArrowLeft className="w-4 h-4 mr-2" />Back</Button>
+            <div><h1 className="text-xl font-bold text-white">Step 1: Create Your Art</h1><p className="text-sm text-gray-300">Express your emotions through drawing</p></div>
           </div>
           <div className="flex items-center space-x-2">
-            <Button onClick={saveAndContinue} className="bg-[#8ecae6] text-[#282c34] hover:bg-[#5390d9]">
+            <Button onClick={saveAndContinue} className="bg-[#f9a8d4] text-[#282c34] hover:bg-[#c084fc] hover:text-white">
               Save & Continue to Step 2
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
@@ -113,17 +113,17 @@ const Drawing = () => {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <Card className="lg:col-span-1 gentle-shadow border-0 bg-[#20232a]">
-            <CardHeader><CardTitle className="flex items-center space-x-2 text-white"><Palette className="w-5 h-5" /><span>Tools</span></CardTitle></CardHeader>
+          <Card className="lg:col-span-1 gentle-shadow border-0 bg-[#F0F0F0]">
+            <CardHeader><CardTitle className="flex items-center space-x-2 text-gray-900"><Palette className="w-5 h-5" /><span>Tools</span></CardTitle></CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <label className="text-sm font-medium text-gray-300 mb-3 block">Colors</label>
+                <label className="text-sm font-medium text-gray-700 mb-3 block">Colors</label>
                 <div className="grid grid-cols-4 gap-2">
                   {colors.map((color) => (<button key={color} onClick={() => { setCurrentColor(color); setIsErasing(false); }} className={`w-8 h-8 rounded-full border-2 transition-all duration-200 ${currentColor === color && !isErasing ? 'border-[#8ecae6] scale-110' : 'border-gray-700 hover:scale-105'}`} style={{ backgroundColor: color }} />))}
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-300 mb-3 block">Brush size: {brushSize}px</label>
+                <label className="text-sm font-medium text-gray-700 mb-3 block">Brush size: {brushSize}px</label>
                 <input type="range" min="1" max="20" value={brushSize} onChange={(e) => setBrushSize(parseInt(e.target.value))} className="w-full accent-[#8ecae6]" />
               </div>
               <div className="space-y-2">
@@ -135,7 +135,7 @@ const Drawing = () => {
 
           <Card className="lg:col-span-3 gentle-shadow border-0 bg-[#20232a]">
             <CardContent className="p-6">
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="bg-[#F0F0F0] rounded-lg border border-gray-200 overflow-hidden">
                 <canvas ref={canvasRef} onMouseDown={startDrawing} onMouseMove={draw} onMouseUp={stopDrawing} onMouseLeave={stopDrawing} className="w-full h-[500px] cursor-crosshair" style={{ touchAction: 'none' }} />
               </div>
             </CardContent>

@@ -8,6 +8,9 @@ class PatientProfileRead(BaseModel):
     gender: Optional[str] = None
     treatment: Optional[str] = None
     notes: Optional[str] = None
+    last_activity_type: Optional[str] = None
+    last_tca_type: Optional[str] = None
+    last_voice_uri: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -23,3 +26,6 @@ class PatientProfileUpdate(BaseModel):
     gender: Optional[str] = None
     treatment: Optional[str] = None
     notes: Optional[str] = None
+    last_activity_type: Optional[str] = None
+    last_tca_type: Optional[str] = None
+    last_voice_uri: Optional[str] = None

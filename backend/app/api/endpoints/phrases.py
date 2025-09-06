@@ -1,8 +1,8 @@
 # en backend/app/api/endpoints/phrases.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app import crud, schemas
-from app.database import get_db
+from ... import crud, schemas
+from ...database import get_db
 
 router = APIRouter()
 

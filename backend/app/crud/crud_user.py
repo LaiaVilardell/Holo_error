@@ -80,3 +80,11 @@ def remove_patient_from_therapist(db: Session, therapist_id: int, patient_id: in
         therapist.patients.remove(patient)
         db.commit()
     return therapist
+
+def update_user_avatar(db: Session, user_id: int, avatar_data: str):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if db_user:
+        db_user.avatar = avatar_data
+        db.commit()
+        db.refresh(db_user)
+    return db_user

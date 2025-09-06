@@ -57,7 +57,7 @@ const Register = () => {
     <div className="min-h-screen flex items-center justify-center bg-[#282c34] p-4">
       <Card className="w-full max-w-md gentle-shadow bg-[#20232a] border-0">
         <CardHeader className="text-center space-y-4">
-          <img src="/logo_2.png" alt="Holo Logo" className="w-24 h-24 mx-auto" />
+          <img src="/HOLO.png" alt="Holo Logo" className="w-24 h-24 mx-auto" />
           <CardTitle className="text-2xl font-bold bg-gradient-to-r from-[#8ecae6] to-[#5390d9] bg-clip-text text-transparent">
             Join Holo
           </CardTitle>
@@ -104,15 +104,15 @@ const Register = () => {
                 </div>
               </RadioGroup>
             </div>
-            <Button type="submit" className="w-full bg-[#8ecae6] text-[#282c34] font-medium py-2 hover:bg-[#5390d9] hover:text-white transition-all duration-200" disabled={isLoading}>
-              {isLoading ? (<div className="flex items-center space-x-2"><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div><span>Creating account...</span></div>) : (<div className="flex items-center space-x-2"><UserPlus className="w-4 h-4" /><span>Create Account</span></div>)}
+            <Button type="submit" className="w-full bg-[#c084fc] text-white font-medium py-3 hover:bg-[#a064d9]">
+              Register
             </Button>
           </form>
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-400">
               Already have an account?{' '}
-              <Link to="/login" className="text-[#f9a8d4] hover:text-[#c084fc] font-medium">
-                Log in here
+              <Link to="/login" className="text-[#c084fc] hover:text-[#a064d9] font-medium">
+                Login here
               </Link>
             </p>
           </div>

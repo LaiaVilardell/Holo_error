@@ -7,11 +7,12 @@ import Register from './pages/Register';
 import PatientDashboard from './pages/PatientDashboard';
 import TherapistDashboard from './pages/TherapistDashboard';
 import Drawing from './pages/Drawing';
-import Avatar from './pages/Avatar';
+
 import NotFound from './pages/NotFound';
 import DashboardRedirect from './pages/DashboardRedirect';
 import ConversationSetup from './pages/ConversationSetup';
 import Conversation from './pages/Conversation'; // <-- AÑADIDO
+import AvatarCreator from './pages/AvatarCreator';
 
 function App() {
   return (
@@ -31,7 +32,8 @@ function App() {
           {/* Rutas de Pacientes */}
           <Route path="/patient/dashboard" element={<PatientDashboard />} />
           <Route path="/patient/drawing" element={<Drawing />} />
-          <Route path="/patient/avatar" element={<Avatar />} />
+          <Route path="/avatar-creator" element={<AvatarCreator />} />
+          
           <Route path="/conversation-setup" element={<ConversationSetup />} />
           <Route path="/conversation" element={<Conversation />} /> {/* <-- AÑADIDO */}
 

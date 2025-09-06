@@ -1,6 +1,6 @@
 # en backend/app/initial_data.py
 from sqlalchemy.orm import Session
-from app import crud, schemas, models
+from . import crud, schemas, models
 
 def seed_db(db: Session):
     # --- Creación de usuarios de test ---
